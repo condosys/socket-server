@@ -2,7 +2,7 @@
 
 Reconstruir módulos de node:
 ```
-nom install
+npm install
 ```
 
 Generar el DIST:
