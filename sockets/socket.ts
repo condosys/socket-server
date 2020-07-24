@@ -11,10 +11,12 @@ export const conectarCliente = (cliente: Socket) => {
 }
 
 
-export const desconectar = (cliente: Socket) => {
+export const desconectar = (cliente: Socket, io:socketIO.Server) => {
     cliente.on('disconnect', () => {                
         let usrDescon = usuariosConectados.borrarUsuario(cliente.id);
-        console.log('Cliente desconectado', usrDescon?.id);
+        //console.log('Cliente desconectado', usrDescon?.id);
+
+        io.emit('usuarios-activos', usuariosConectados.getLista());
 
     });
 }
@@ -22,7 +24,7 @@ export const desconectar = (cliente: Socket) => {
 //Escuchar eventoMensaje emitido por el ciente.
 export const fnMensaje = ( cliente: Socket, io:socketIO.Server) => {
     cliente.on('eventoMensaje', (payload: {de: string, cuerpo: string}) =>{
-        console.log('Mensaje recibido ... ', payload);
+        //console.log('Mensaje recibido ... ', payload);
         io.emit('mensaje-nuevo', payload);
     });
 }
@@ -34,9 +36,18 @@ export const configurarUsurio = ( cliente: Socket, io:socketIO.Server) => {
 
         usuariosConectados.actualizarNombre(cliente.id, payload.nombre);
 
+        io.emit('usuarios-activos', usuariosConectados.getLista());
+        
         callback({
             ok:true,
             mensaje:`Usuario ${payload.nombre} configurado.`
         });
+    });
+}
+
+//Escuchar evento para Obtener Lista de Usuarios y colocarla en el chat.
+export const obtenerUsuarios = ( cliente: Socket, io:socketIO.Server) => {
+    cliente.on('cte-pide-usrs-conectados', () => {
+        io.to(cliente.id).emit('usuarios-activos', usuariosConectados.getLista());
     });
 }

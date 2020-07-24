@@ -43,7 +43,10 @@ export default class Server{
             socket.fnMensaje(cliente, this.io);
 
             //Desconectar cliente
-            socket.desconectar(cliente);
+            socket.desconectar(cliente, this.io);
+
+            //Emite los usuarios-activos para que el cliente los reciba.
+            socket.obtenerUsuarios(cliente, this.io);
 
             
         });
